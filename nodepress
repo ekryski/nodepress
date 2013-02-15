@@ -1,0 +1,48 @@
+#!/usr/bin/env node
+
+var marked = require('marked');
+var path = require('path');
+var fs = require('fs');
+var program = require('commander');
+var pkg = require('./package.json');
+
+program
+  .version(pkg.version)
+  .usage('[options] <slides.md>')
+  .description(pkg.description)
+  .option('-s, --stylesheet <path>', 'Use a custom stylesheet')
+  .option('-o, --output <path>', 'Output html file')
+  .option('-t, --no-tables', 'Disable table rendering')
+  .option('-g, --no-gfm', 'Disable Github Flavoured Markdown');
+
+program
+  .command('*')
+  .description('parse the given markdown file')
+  .action(function(env){
+    console.log(env);
+
+    // TODO: Read file from disk
+    // TODO: Run file though marked
+    // TODO: Either fork and modify marked to support custom markdown for impress
+    // or push through marked and then modify the dom after.
+    // TODO: Save file as index.html
+  });
+
+program.parse(process.argv);
+
+marked.setOptions({
+  gfm: !program.gfm || true,
+  tables: !program.tables || true,
+  breaks: false,
+  pedantic: false,
+  sanitize: true,
+  smartLists: true,
+  langPrefix: 'language-',
+  highlight: function(code, lang) {
+    if (lang === 'js') {
+      return highlighter.javascript(code);
+    }
+    return code;
+  }
+});
+
